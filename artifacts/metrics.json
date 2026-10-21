@@ -1,0 +1,11 @@
+{
+  "holdout_customers": 3920,
+  "targeted_customers": 2234,
+  "target_rate": 0.5699,
+  "expected_incremental_profit_usd": 70120.78,
+  "uplift_rank_correlation": 0.6465,
+  "arm_roc_auc": {
+    "0": 0.6729,
+    "1": 0.7228
+  }
+}
