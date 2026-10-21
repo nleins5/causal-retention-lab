@@ -1,18 +1,18 @@
 # Causal Retention Lab
 
-> Who should receive a retention offer when the objective is incremental profit, not churn probability?
+Choosing who receives a retention offer requires estimating who will change their behavior, not just who might leave.
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![CI](https://github.com/nleins5/causal-retention-lab/actions/workflows/pipeline.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-0f766e)
 
-This project turns a randomized SaaS retention experiment into a targeting policy. Two response models estimate each customer's conditional treatment effect, and a simple value model converts uplift into an operational decision.
+I generated a randomized SaaS retention experiment with known treatment effects, then trained separate response models for contacted and uncontacted customers. Their predicted difference becomes an estimated churn reduction. A contact is recommended when that reduction, multiplied by retained margin, exceeds the offer cost.
 
 ![Holdout results](artifacts/retention_results.png)
 
-## Business result
+## Results on simulated data
 
-The pipeline separates customers who are likely to churn from customers whose behavior can actually be changed. It reports the expected incremental profit after contact cost, the recommended target rate, and uplift calibration by decile.
+The holdout has 3,920 customers. The policy selects 2,234 of them and estimates $70,120.78 in incremental profit under the simulation's margin and cost assumptions. This is a model estimate, not observed company revenue.
 
 | Holdout result | Value |
 |---|---:|
@@ -21,12 +21,7 @@ The pipeline separates customers who are likely to churn from customers whose be
 | Uplift rank correlation | 0.6465 |
 | Control / treatment ROC AUC | 0.6729 / 0.7228 |
 
-## What this demonstrates
-
-- Causal framing and heterogeneous treatment effects
-- Leakage-safe train/holdout evaluation
-- Profit-aware decision thresholds
-- Reproducible data generation, pipeline artifacts, Docker, and CI
+The chart compares predicted uplift with the known effect across customer groups. Ranking works reasonably well, though the highest decile is overestimated. That gap matters: a real campaign would need an independently measured policy value before rollout.
 
 ## Reproduce
 
@@ -37,18 +32,9 @@ make install
 make run
 ```
 
-Outputs are written to `artifacts/`. The generated experiment is synthetic by design: treatment assignment and ground-truth uplift are known, so ranking quality can be evaluated honestly without sharing customer data.
+Outputs are written to `artifacts/`. The experiment is synthetic so treatment assignment and true uplift can be inspected; no private customer records are needed.
 
-## Repository map
+## What I would improve next
 
-```text
-src/retention_lab/       simulation, modeling, policy evaluation
-data/                    reproducible experiment snapshot
-artifacts/               metrics, decision table, and chart
-.github/workflows/       CI reproduction job
-```
-
-## Interview discussion
-
-Useful extensions include doubly robust learners, confidence intervals for policy value, treatment budget constraints, and monitoring for changes in treatment propensity.
+I would test a doubly robust estimator, attach confidence intervals to policy value, and evaluate the policy against a randomized holdout with a fixed contact budget.
 
